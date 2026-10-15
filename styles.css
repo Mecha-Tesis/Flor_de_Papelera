@@ -1,0 +1,277 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   FLOR DE PAPELERA — catálogo mayorista
+   Lectura de diseño: catálogo impreso de papelera mayorista, para revendedoras
+   y organizadoras de fiestas que piden por WhatsApp desde el celular.
+   Energía 2 / Ritmo 1 / Movimiento 1 — el producto manda, la interfaz calla.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Color ────────────────────────────────────────────────────────────
+     Rojo señalético + negro tinta + papel crudo: la paleta de un catálogo
+     impreso. Todos los pares texto/fondo verificados a WCAG AA. */
+  --red:        #C41010;
+  --red-dark:   #960D0D;
+  --red-light:  #FAE8E8;
+  --red-on-dark:#E8322A;   /* el rojo de marca aclarado para fondo negro: 4.4:1 */
+  --black:      #0C0C0C;
+  --gray-dark:  #2A2A2A;
+  --gray-mid:   #5E5A55;   /* 6.6:1 sobre blanco */
+  --gray-soft:  #6E6862;   /* 5.3:1 sobre blanco — textos secundarios */
+  --on-dark:    #9A948C;   /* 7.3:1 sobre negro  — textos sobre negro */
+  --on-dark-dim:#8A847C;   /* 6.0:1 sobre negro */
+  --on-red:     rgba(255,255,255,0.88);
+  --border:     #DDD7CE;
+  --border-mid: #CFC7BB;
+  --bg:         #F0EAE0;
+  --card:       #FFFFFF;
+  --white:      #FFFFFF;
+  --ok:         #1A7A1A;
+  --wa:         #0B7A6A;   /* verde WhatsApp oscurecido: blanco encima = 5.2:1 */
+  --wa-dark:    #09655A;
+
+  /* ── Espaciado ──────────────────────────────────────────────────────── */
+  --s1: 4px;  --s2: 8px;  --s3: 12px; --s4: 16px;
+  --s5: 24px; --s6: 32px; --s7: 48px; --s8: 64px;
+
+  /* ── Elevación ──────────────────────────────────────────────────────── */
+  --sh-rest:  0 1px 4px rgba(0,0,0,0.05);
+  --sh-raise: 0 4px 20px rgba(196,16,16,0.14);
+  --sh-over:  -8px 0 48px rgba(0,0,0,0.18);
+
+  /* ── Movimiento ─────────────────────────────────────────────────────── */
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --t-micro: 130ms;
+  --t-ui:    200ms;
+  --t-panel: 300ms;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  scroll-behavior: smooth;
+  /* el header es sticky: que no tape lo que recibe foco */
+  scroll-padding-top: 120px;
+}
+
+body {
+  font-family: 'Barlow', system-ui, -apple-system, sans-serif;
+  background-color: var(--bg);
+  /* Lunares: el papel de lunares que venden. Decoración con motivo, no ruido. */
+  background-image: radial-gradient(circle, var(--border) 1.2px, transparent 1.2px);
+  background-size: 26px 26px;
+  color: var(--black);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img { max-width: 100%; }
+
+::selection { background: var(--red); color: #fff; }
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--red); }
+
+/* ── Foco visible (nunca se quita el outline sin reemplazo) ──────────── */
+:focus-visible {
+  outline: 3px solid var(--black);
+  outline-offset: 2px;
+}
+header :focus-visible,
+.on-red :focus-visible,
+.wa-fab:focus-visible {
+  outline-color: #fff;
+}
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+.skip-link {
+  position: absolute; left: var(--s4); top: -100px; z-index: 1000;
+  background: var(--black); color: #fff; padding: 10px 16px;
+  font-weight: 600; text-decoration: none;
+  transition: top var(--t-micro) var(--ease-smooth);
+}
+.skip-link:focus { top: var(--s2); }
+
+/* ── Campos ──────────────────────────────────────────────────────────── */
+header input::placeholder { color: rgba(255,255,255,0.85); }
+
+.field {
+  width: 100%; padding: 10px 14px;
+  border: none; background: rgba(255,255,255,0.2);
+  color: #fff; font-family: 'Barlow', sans-serif; font-size: 15px;
+}
+.field:focus-visible { outline: 3px solid #fff; outline-offset: 0; }
+
+/* ── Tarjeta de producto ─────────────────────────────────────────────── */
+.card {
+  background: #fff;
+  border: 2px solid var(--border);
+  box-shadow: var(--sh-rest);
+  display: flex; flex-direction: column;
+  transition: border-color var(--t-micro) var(--ease-smooth),
+              box-shadow var(--t-micro) var(--ease-smooth);
+}
+.card:focus-within { border-color: var(--red); }
+
+@media (hover: hover) and (pointer: fine) {
+  .card:hover { border-color: var(--red); box-shadow: var(--sh-raise); cursor: pointer; }
+}
+
+.card-media {
+  height: 180px; flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+  background: #fff;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+/* contain, no cover: en un catálogo mayorista el producto se ve entero */
+.card-media img { width: 100%; height: 100%; object-fit: contain; display: block; }
+
+.card-title {
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: 18px; font-weight: 700; line-height: 1.2;
+  color: var(--black); margin: 0;
+}
+.card-title button {
+  font: inherit; color: inherit; background: none; border: 0;
+  padding: 3px 0; text-align: left; cursor: pointer;
+  display: block; min-height: 26px; width: 100%;
+}
+/* el botón del título cubre la tarjeta: click en cualquier lado = abrir */
+.card-title button::after { content: ''; position: absolute; inset: 0; }
+
+/* ── Botones ─────────────────────────────────────────────────────────── */
+.btn {
+  font-family: 'Barlow', sans-serif; font-weight: 600;
+  border: none; cursor: pointer;
+  transition: background-color var(--t-micro) var(--ease-smooth),
+              filter var(--t-micro) var(--ease-smooth);
+}
+.btn-add {
+  background: var(--red); color: #fff;
+  padding: 11px 0; font-size: 14px; letter-spacing: 0.03em;
+  min-height: 44px; width: 100%;
+}
+@media (hover: hover) and (pointer: fine) {
+  .btn-add:hover { background: var(--red-dark); }
+}
+.btn-add:active { background: var(--red-dark); }
+
+.btn-wa {
+  background: var(--wa); color: #fff;
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-weight: 800; font-size: 17px; letter-spacing: 0.06em;
+}
+@media (hover: hover) and (pointer: fine) { .btn-wa:hover { background: var(--wa-dark); } }
+
+/* Stepper de cantidad */
+.stepper { display: flex; align-items: center; border: 2px solid var(--red); }
+.stepper button {
+  width: 44px; min-height: 40px; background: none; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--red); flex-shrink: 0;
+  transition: background-color var(--t-micro) var(--ease-smooth);
+}
+.stepper button:last-child { background: var(--red); color: #fff; }
+@media (hover: hover) and (pointer: fine) {
+  .stepper button:hover { background: var(--red-light); }
+  .stepper button:last-child:hover { background: var(--red-dark); }
+}
+.stepper .qty {
+  flex: 1; text-align: center;
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-weight: 700; font-size: 19px; color: var(--red);
+}
+
+/* ── Muestras de color ───────────────────────────────────────────────── */
+.swatch {
+  width: 28px; height: 28px; padding: 0; flex-shrink: 0;
+  background: none; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.swatch i {
+  display: block; width: 22px; height: 22px; border-radius: 50%;
+  border: 1.5px solid rgba(0,0,0,0.25);
+  transition: transform var(--t-micro) var(--ease-spring);
+}
+.swatch[aria-pressed="true"] i { outline: 2.5px solid var(--red); outline-offset: 2px; }
+@media (hover: hover) and (pointer: fine) { .swatch:hover i { transform: scale(1.12); } }
+
+/* ── Solapas de categoría ────────────────────────────────────────────── */
+.cat-tab {
+  padding: 12px 18px; background: none; border: none; cursor: pointer;
+  font-family: 'Barlow', sans-serif; font-size: 14px; letter-spacing: 0.03em;
+  color: rgba(255,255,255,0.78); font-weight: 500;
+  border-bottom: 3px solid transparent; white-space: nowrap;
+  transition: color var(--t-micro) var(--ease-smooth),
+              border-color var(--t-micro) var(--ease-smooth);
+}
+.cat-tab[aria-pressed="true"] { color: #fff; font-weight: 700; border-bottom-color: #fff; }
+@media (hover: hover) and (pointer: fine) { .cat-tab:hover { color: #fff; } }
+
+/* ── Carrito ─────────────────────────────────────────────────────────── */
+.cart-item { animation: cartItemIn var(--t-ui) var(--ease-spring) both; }
+@keyframes cartItemIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+/* visible siempre: en touch no hay hover */
+.cart-remove {
+  position: absolute; top: 4px; right: 4px;
+  width: 32px; height: 32px;
+  background: none; border: none; cursor: pointer;
+  color: var(--gray-soft);
+  display: flex; align-items: center; justify-content: center;
+  transition: color var(--t-micro) var(--ease-smooth);
+}
+@media (hover: hover) and (pointer: fine) { .cart-remove:hover { color: var(--red); } }
+
+/* cerrado: fuera del orden de tabulación, no sólo fuera de pantalla */
+.drawer[aria-hidden="true"] { visibility: hidden; }
+
+/* ── Modal ───────────────────────────────────────────────────────────── */
+.modal { animation: modalIn 220ms var(--ease-spring) both; }
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(16px) scale(0.98); }
+  to   { opacity: 1; transform: none; }
+}
+.modal-media img { width: 100%; height: 100%; object-fit: contain; display: block; }
+
+/* ── Botón flotante de WhatsApp ──────────────────────────────────────── */
+.wa-fab {
+  position: fixed; bottom: var(--s5); left: var(--s5); z-index: 600;
+  background: var(--wa); color: #fff;
+  width: 56px; height: 56px;
+  display: flex; align-items: center; justify-content: center;
+  text-decoration: none;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  transition: background-color var(--t-micro) var(--ease-smooth),
+              transform var(--t-micro) var(--ease-spring);
+}
+@media (hover: hover) and (pointer: fine) {
+  .wa-fab:hover { background: var(--wa-dark); transform: translateY(-2px); }
+}
+
+/* ── Pie ─────────────────────────────────────────────────────────────── */
+.site-footer a { color: var(--on-dark); text-decoration: none; }
+.site-footer a:hover { color: #fff; text-decoration: underline; }
+
+/* ── Grilla del catálogo ─────────────────────────────────────────────── */
+.catalog-grid { display: grid; gap: var(--s3); }
+
+/* ── Preferencia de movimiento reducido ──────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
